@@ -19,10 +19,9 @@ describe('tests for fs.readFileSync', () => {
         'index.js': '42;',
       },
     };
-    await withFixtures(FIXTURS, async (fixturesDir) => {
-      // A temporary `fixturesDir` exists at this point with `anotherDir`
-      // as a subdirectory and a `README.md` file. `anotherDir` contains
-      // the `index.js` file.
+    await withFixtures(FIXTURES, async (fixturesDir) => {
+      // A temporary `fixturesDir` exists at this point with `README.md`
+      // and `anotherDir`. The latter contains `index.js`.
       const readmePath = path.join(fixturesDir, 'README.md');
       const contents = fs.readFileSync(readmePath, 'utf8');
       assert.strictEqual(contents, FIXTURES['README.md']);     
