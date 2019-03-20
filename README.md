@@ -1,5 +1,7 @@
 # inline-fixtures
 
+[![CircleCI](https://circleci.com/gh/ofrobots/inline-fixtures.svg?style=svg)](https://circleci.com/gh/ofrobots/inline-fixtures)
+
 Sometimes tests need fixture directories. It would be nice if the fixtures were inline, next to the test source code. This module helps you do that.
 It dynamic creates a temporary directory and populates it with the fixture
 layout you provide, and then calls the passed in function. This has the
