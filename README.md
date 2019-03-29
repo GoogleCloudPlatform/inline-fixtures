@@ -29,7 +29,7 @@ describe('tests for fs.readFileSync', () => {
     const FIXTURES = {
       'README.md': 'Hello Mars.',
       anotherDir: {
-        'dot.js': '42;',
+        'index.js': '42;',
       },
     };
     await withFixtures(FIXTURES, async (fixturesDir) => {
