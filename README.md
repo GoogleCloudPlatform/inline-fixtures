@@ -5,14 +5,12 @@
 Sometimes tests need fixture directories. [Observe](https://github.com/nodejs/node/blob/d3fb7e1b3658a6f00e1c631aa551f2ea0ab81f5e/test/parallel/test-require-dot.js):
 
 ```js
-const fixtures = require('../common/fixtures');
-
-const a = require(fixtures.path('module-require', 'relative', 'dot.js'));
-const b = require(fixtures.path('module-require', 'relative', 'dot-slash.js'));
+const a = require(path.join('module-require', 'relative', 'dot.js'));
+const b = require(path.join('module-require', 'relative', 'dot-slash.js'));
 //...
 ```
 
-At this point it is not clear what the fixture files themselves actually do, or how the rest of the test file relates to them.
+At this point it is not clear what the fixture files themselves actually do, or how the rest of the test file relates to them. One must have both the fixtures and the test open together to actually understand the test.
 
 It would be nice if the fixtures were inline, next to the test source code.
 
