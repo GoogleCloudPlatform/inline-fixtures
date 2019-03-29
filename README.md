@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/ofrobots/inline-fixtures.svg?style=svg)](https://circleci.com/gh/ofrobots/inline-fixtures)
 
-Sometimes tests need fixture directories. It would be nice if the fixtures were inline, next to the test source code. [Observe](https://github.com/nodejs/node/blob/d3fb7e1b3658a6f00e1c631aa551f2ea0ab81f5e/test/parallel/test-require-dot.js):
+Sometimes tests need fixture directories. [Observe](https://github.com/nodejs/node/blob/d3fb7e1b3658a6f00e1c631aa551f2ea0ab81f5e/test/parallel/test-require-dot.js):
 
 ```js
 const fixtures = require('../common/fixtures');
@@ -12,7 +12,9 @@ const b = require(fixtures.path('module-require', 'relative', 'dot-slash.js'));
 //...
 ```
 
-At this point it is not clear what the fixture files themselves actually do, or how the rest of the test file relates to them. Tests and fixtures should be together! The fixture is part of the test.
+At this point it is not clear what the fixture files themselves actually do, or how the rest of the test file relates to them.
+
+It would be nice if the fixtures were inline, next to the test source code.
 
 `inline-fixtures` dynamically creates a temporary directory and populates it with the fixture
 layout you provide, and then calls the passed in function. This has the
