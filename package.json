@@ -1,10 +1,10 @@
 {
   "name": "inline-fixtures",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "repository": "ofrobots/inline-fixtures",
   "publishConfig": {
-    "registry":"https://wombat-dressing-room.appspot.com"
+    "registry": "https://wombat-dressing-room.appspot.com"
   },
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
