@@ -2,6 +2,7 @@
   "name": "inline-fixtures",
   "version": "1.0.0",
   "description": "",
+  "repository": "ofrobots/inline-fixtures",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "files": [
