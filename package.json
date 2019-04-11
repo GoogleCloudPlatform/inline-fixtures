@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "repository": "ofrobots/inline-fixtures",
+  "publishConfig": {
+    "registry":"https://wombat-dressing-room.appspot.com"
+  },
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "files": [
