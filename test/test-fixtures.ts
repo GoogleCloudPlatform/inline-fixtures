@@ -18,7 +18,11 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tmp from 'tmp';
-import { setupFixtures, withFixtures, FixtureContent } from '../src/fixtures';
+import {
+  setupFixtures,
+  withFixtures,
+  FixturesWithPermission,
+} from '../src/fixtures';
 
 describe(__filename, () => {
   describe('setupFixtures', () => {
@@ -60,9 +64,11 @@ describe(__filename, () => {
     it('should create an unaccessible file', async () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
-        const password = '123456';
         const FIXTURES = {
-          'SECRET.key': new FixtureContent(password),
+          'SECRET.key': {
+            mode: 0o000,
+            content: '123456',
+          },
         };
         await setupFixtures(dir.name, FIXTURES);
         const indexPath = path.join(dir.name, 'SECRET.key');
@@ -75,11 +81,13 @@ describe(__filename, () => {
     it('should create an unaccessible directory', async () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
-        const SUBFIXTURES = {
-          'README.md': 'Hello World.',
-        };
         const FIXTURES = {
-          private: new FixtureContent(SUBFIXTURES),
+          private: {
+            mode: 0o000,
+            content: {
+              'README.md': 'Hello World.',
+            },
+          },
         };
         const unaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
         const indexPath = path.join(dir.name, 'private', 'README.md');
@@ -95,48 +103,23 @@ describe(__filename, () => {
     it('should work with nested unaccessible directories', async () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
-        const DEEPERFIXTURES = {
-          'SECRET.key': new FixtureContent('123456'),
-        };
-        const DEEPFIXTURES = {
-          secret: new FixtureContent(DEEPERFIXTURES),
-        };
         const FIXTURES = {
-          private: new FixtureContent(DEEPFIXTURES),
-        };
-        const unaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
-        const indexPath = path.join(
-          dir.name,
-          'private',
-          'secret',
-          'SECRET.key'
-        );
-        assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
-        unaccessibleFixtures.forEach((filePath: string) =>
-          fs.chmodSync(filePath, 0o777)
-        );
-      } finally {
-        dir.removeCallback();
-      }
-    });
-
-    it('should work with nested mixed directories', async () => {
-      const dir = tmp.dirSync({ unsafeCleanup: true });
-      try {
-        const DEEPERFIXTURES = {
-          'SECRET.key': new FixtureContent('123456'),
-          'PUBLIC.key': '654321',
-        };
-        const DEEPFIXTURES = {
-          secret: DEEPERFIXTURES,
-          anotherDir: {
-            'index.js': '42;',
+          private: {
+            mode: 0o000,
+            content: {
+              secret: {
+                mode: 0o000,
+                content: {
+                  'SECRET.key': {
+                    content: {
+                      mode: 0o000,
+                      content: '123456',
+                    },
+                  },
+                },
+              },
+            },
           },
-          'anotherfile.js': '99;',
-        };
-        const FIXTURES = {
-          private: new FixtureContent(DEEPFIXTURES, 0o644),
-          'README.md': 'Hello World.',
         };
         const unaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
         const indexPath = path.join(
