@@ -20,7 +20,7 @@ import * as path from 'path';
 import * as tmp from 'tmp';
 
 export class FixtureContent {
-  constructor (public content: string | Fixtures, public mode = 0o000) { }
+  constructor(public content: string | Fixtures, public mode = 0o000) {}
   toFixture(key: string): Fixtures {
     return { [key]: this.content };
   }
