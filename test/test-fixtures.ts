@@ -175,6 +175,26 @@ describe(__filename, () => {
       assert.strict(process.cwd(), origDir);
     });
 
+    it('should work with inaccessible assets', async () => {
+      const SUBFIXTURES = {
+        'README.md': 'Hello World.',
+      };
+      const FIXTURES = {
+        private: new FixtureContent(SUBFIXTURES),
+      };
+      const origDir = process.cwd();
+      let readmePath: string;
+
+      await withFixtures(FIXTURES, async fixturesDir => {
+        assert.strictEqual(process.cwd(), fs.realpathSync(fixturesDir));
+        readmePath = path.join(fixturesDir, 'private', 'README.md');
+        assert.throws(() => fs.readFileSync(readmePath, 'utf8'));
+      });
+      assert.strict(process.cwd(), origDir);
+      // test that the directory is removed
+      assert.throws(() => fs.readFileSync(readmePath, 'utf8'));
+    });
+
     it('should cleanup temporary directories');
     it('should keep temporary directories when INLINE_FIXTURES_KEEP is set');
   });
