@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tmp from 'tmp';
-import { setupFixtures, withFixtures } from '../src/fixtures';
+import { setupFixtures, withFixtures, FixtureContent } from '../src/fixtures';
 
 describe(__filename, () => {
   describe('setupFixtures', () => {
@@ -56,6 +56,108 @@ describe(__filename, () => {
         dir.removeCallback();
       }
     });
+
+    it('should create an inaccessible file', async () => {
+      const dir = tmp.dirSync({ unsafeCleanup: true });
+      try {
+        const password = '123456';
+        const FIXTURES = {
+          'SECRET.key': new FixtureContent(password),
+        };
+        await setupFixtures(dir.name, FIXTURES);
+        const indexPath = path.join(dir.name, 'SECRET.key');
+        assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
+      } finally {
+        dir.removeCallback();
+      }
+    });
+
+    it('should create an inaccessible directory', async () => {
+      const dir = tmp.dirSync({ unsafeCleanup: true });
+      try {
+        const SUBFIXTURES = {
+          'README.md': 'Hello World.',
+        };
+        const FIXTURES = {
+          private: new FixtureContent(SUBFIXTURES),
+        };
+        const inaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
+        const indexPath = path.join(dir.name, 'private', 'README.md');
+        assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
+        inaccessibleFixtures.forEach((filePath: string) =>
+          fs.chmodSync(filePath, 0o777)
+        );
+      } finally {
+        dir.removeCallback();
+      }
+    });
+
+    it('should work with nested inaccessible directories', async () => {
+      const dir = tmp.dirSync({ unsafeCleanup: true });
+      try {
+        const DEEPERFIXTURES = {
+          'SECRET.key': new FixtureContent('123456'),
+        };
+        const DEEPFIXTURES = {
+          secret: new FixtureContent(DEEPERFIXTURES),
+        };
+        const FIXTURES = {
+          private: new FixtureContent(DEEPFIXTURES),
+        };
+        const inaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
+        const indexPath = path.join(
+          dir.name,
+          'private',
+          'secret',
+          'SECRET.key'
+        );
+        assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
+        inaccessibleFixtures.forEach((filePath: string) =>
+          fs.chmodSync(filePath, 0o777)
+        );
+      } finally {
+        dir.removeCallback();
+      }
+    });
+
+    it('should work with nested mixed directories', async () => {
+      const dir = tmp.dirSync({ unsafeCleanup: true });
+      try {
+        const DEEPERFIXTURES = {
+          'SECRET.key': new FixtureContent('123456'),
+          'PUBLIC.key': '654321',
+        };
+        const DEEPFIXTURES = {
+          secret: DEEPERFIXTURES,
+          anotherDir: {
+            'index.js': '42;',
+          },
+          'anotherfile.js': '99;',
+        };
+        const FIXTURES = {
+          private: new FixtureContent(DEEPFIXTURES, 0o644),
+          'README.md': 'Hello World.',
+        };
+        const inaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
+
+        // test SECRET.key is inaccessible
+        const indexPath = path.join(
+          dir.name,
+          'private',
+          'secret',
+          'SECRET.key'
+        );
+        assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
+
+        // freeing all up and testing accessibility
+        inaccessibleFixtures.forEach((filePath: string) => {
+          fs.chmodSync(filePath, 0o777);
+          assert.doesNotThrow(() => fs.accessSync(filePath));
+        });
+      } finally {
+        dir.removeCallback();
+      }
+    });
   });
 
   describe('withFixtures', () => {
@@ -71,6 +173,26 @@ describe(__filename, () => {
         assert.strictEqual(contents, FIXTURES['README.md']);
       });
       assert.strict(process.cwd(), origDir);
+    });
+
+    it('should work with inaccessible assets', async () => {
+      const SUBFIXTURES = {
+        'README.md': 'Hello World.',
+      };
+      const FIXTURES = {
+        private: new FixtureContent(SUBFIXTURES),
+      };
+      const origDir = process.cwd();
+      let readmePath: string;
+
+      await withFixtures(FIXTURES, async fixturesDir => {
+        assert.strictEqual(process.cwd(), fs.realpathSync(fixturesDir));
+        readmePath = path.join(fixturesDir, 'private', 'README.md');
+        assert.throws(() => fs.readFileSync(readmePath, 'utf8'));
+      });
+      assert.strict(process.cwd(), origDir);
+      // test that the directory is removed
+      assert.throws(() => fs.readFileSync(readmePath, 'utf8'));
     });
 
     it('should cleanup temporary directories');
