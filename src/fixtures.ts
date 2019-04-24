@@ -37,27 +37,37 @@ export async function setupFixtures(
   dir: string,
   fixtures: Fixtures
 ): Promise<string[]> {
+  let unaccessibleFixtures: string[] = [];
   const keys = Object.keys(fixtures);
+
   for (const key of keys) {
     const filePath = path.join(dir, key);
     const contents = fixtures[key];
+
     if (typeof contents === 'string') {
-      await fs.writeFileSync(filePath, contents);
+      fs.writeFileSync(filePath, contents);
     } else if (contents instanceof FixtureContent) {
-      const unaccessibleFixtures = await setupFixtures(
+      const deepUnaccessibleFixtures = await setupFixtures(
         dir,
         contents.toFixture(key)
       );
       fs.chmodSync(filePath, contents.mode);
-      unaccessibleFixtures.unshift(filePath);
-      return unaccessibleFixtures;
+      unaccessibleFixtures = [
+        filePath,
+        ...deepUnaccessibleFixtures,
+        ...unaccessibleFixtures,
+      ];
     } else {
       await makeDir(filePath);
       const fixture = fixtures[key] as Fixtures;
-      return setupFixtures(filePath, fixture);
+      const deepUnaccessibleFixtures = await setupFixtures(filePath, fixture);
+      unaccessibleFixtures = [
+        ...deepUnaccessibleFixtures,
+        ...unaccessibleFixtures,
+      ];
     }
   }
-  return [];
+  return unaccessibleFixtures;
 }
 
 export async function withFixtures(

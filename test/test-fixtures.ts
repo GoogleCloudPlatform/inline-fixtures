@@ -139,6 +139,8 @@ describe(__filename, () => {
           'README.md': 'Hello World.',
         };
         const unaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
+
+        // test SECRET.key is unaccessible
         const indexPath = path.join(
           dir.name,
           'private',
@@ -146,9 +148,12 @@ describe(__filename, () => {
           'SECRET.key'
         );
         assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
-        unaccessibleFixtures.forEach((filePath: string) =>
-          fs.chmodSync(filePath, 0o777)
-        );
+
+        // freeing all up and testing accessibility
+        unaccessibleFixtures.forEach((filePath: string) => {
+          fs.chmodSync(filePath, 0o777);
+          assert.doesNotThrow(() => fs.accessSync(filePath));
+        });
       } finally {
         dir.removeCallback();
       }
