@@ -57,7 +57,7 @@ describe(__filename, () => {
       }
     });
 
-    it('should create an unaccessible file', async () => {
+    it('should create an inaccessible file', async () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
         const password = '123456';
@@ -72,7 +72,7 @@ describe(__filename, () => {
       }
     });
 
-    it('should create an unaccessible directory', async () => {
+    it('should create an inaccessible directory', async () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
         const SUBFIXTURES = {
@@ -81,10 +81,10 @@ describe(__filename, () => {
         const FIXTURES = {
           private: new FixtureContent(SUBFIXTURES),
         };
-        const unaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
+        const inaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
         const indexPath = path.join(dir.name, 'private', 'README.md');
         assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
-        unaccessibleFixtures.forEach((filePath: string) =>
+        inaccessibleFixtures.forEach((filePath: string) =>
           fs.chmodSync(filePath, 0o777)
         );
       } finally {
@@ -92,7 +92,7 @@ describe(__filename, () => {
       }
     });
 
-    it('should work with nested unaccessible directories', async () => {
+    it('should work with nested inaccessible directories', async () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
         const DEEPERFIXTURES = {
@@ -104,7 +104,7 @@ describe(__filename, () => {
         const FIXTURES = {
           private: new FixtureContent(DEEPFIXTURES),
         };
-        const unaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
+        const inaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
         const indexPath = path.join(
           dir.name,
           'private',
@@ -112,7 +112,7 @@ describe(__filename, () => {
           'SECRET.key'
         );
         assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
-        unaccessibleFixtures.forEach((filePath: string) =>
+        inaccessibleFixtures.forEach((filePath: string) =>
           fs.chmodSync(filePath, 0o777)
         );
       } finally {
@@ -138,9 +138,9 @@ describe(__filename, () => {
           private: new FixtureContent(DEEPFIXTURES, 0o644),
           'README.md': 'Hello World.',
         };
-        const unaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
+        const inaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
 
-        // test SECRET.key is unaccessible
+        // test SECRET.key is inaccessible
         const indexPath = path.join(
           dir.name,
           'private',
@@ -150,7 +150,7 @@ describe(__filename, () => {
         assert.throws(() => fs.readFileSync(indexPath, 'utf8'));
 
         // freeing all up and testing accessibility
-        unaccessibleFixtures.forEach((filePath: string) => {
+        inaccessibleFixtures.forEach((filePath: string) => {
           fs.chmodSync(filePath, 0o777);
           assert.doesNotThrow(() => fs.accessSync(filePath));
         });
