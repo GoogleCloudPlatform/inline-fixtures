@@ -42,27 +42,37 @@ export async function setupFixtures(
   dir: string,
   fixtures: Fixtures
 ): Promise<string[]> {
+  let inaccessibleFixtures: string[] = [];
   const keys = Object.keys(fixtures);
+
   for (const key of keys) {
     const filePath = path.join(dir, key);
-    const contents: string | Fixtures | FixturesWithPermission = fixtures[key];
+    const contents = fixtures[key];
 
     if (typeof contents === 'string') {
-      await fs.writeFileSync(filePath, contents);
-    } else if (isFixturesWithPermission(contents)) {
-      const unaccessibleFixtures = await setupFixtures(dir, {
-        [key]: contents.content,
-      });
+      fs.writeFileSync(filePath, contents);
+    } else if (contents instanceof FixtureContent) {
+      const deepinaccessibleFixtures = await setupFixtures(
+        dir,
+        contents.toFixture(key)
+      );
       fs.chmodSync(filePath, contents.mode);
-      unaccessibleFixtures.unshift(filePath);
-      return unaccessibleFixtures;
+      inaccessibleFixtures = [
+        filePath,
+        ...deepinaccessibleFixtures,
+        ...inaccessibleFixtures,
+      ];
     } else {
       await makeDir(filePath);
       const fixture = fixtures[key] as Fixtures;
-      return setupFixtures(filePath, fixture);
+      const deepinaccessibleFixtures = await setupFixtures(filePath, fixture);
+      inaccessibleFixtures = [
+        ...deepinaccessibleFixtures,
+        ...inaccessibleFixtures,
+      ];
     }
   }
-  return [];
+  return inaccessibleFixtures;
 }
 
 export async function withFixtures(
@@ -72,7 +82,7 @@ export async function withFixtures(
   const keep = !!process.env.INLINE_FIXTURES_KEEP;
   const dir = tmp.dirSync({ keep, unsafeCleanup: true });
 
-  const unaccessibleFixtures = await setupFixtures(dir.name, fixtures);
+  const inaccessibleFixtures = await setupFixtures(dir.name, fixtures);
 
   const origDir = process.cwd();
   process.chdir(dir.name);
@@ -80,7 +90,7 @@ export async function withFixtures(
   try {
     return await fn(dir.name);
   } finally {
-    unaccessibleFixtures.forEach((filePath: string) =>
+    inaccessibleFixtures.forEach((filePath: string) =>
       fs.chmodSync(filePath, 0o777)
     );
     process.chdir(origDir);
