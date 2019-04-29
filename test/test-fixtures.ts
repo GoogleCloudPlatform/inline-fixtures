@@ -18,11 +18,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tmp from 'tmp';
-import {
-  setupFixtures,
-  withFixtures,
-  FixturesWithPermission,
-} from '../src/fixtures';
+import { setupFixtures, withFixtures, Fixtures } from '../src/fixtures';
 
 describe(__filename, () => {
   describe('setupFixtures', () => {
@@ -65,9 +61,9 @@ describe(__filename, () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
         const FIXTURES = {
-          'SECRET.key': {
+          'README.md': {
             mode: 0o000,
-            content: '123456',
+            content: 'Hello World.',
           },
         };
         await setupFixtures(dir.name, FIXTURES);
@@ -104,8 +100,24 @@ describe(__filename, () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
         const FIXTURES = {
-          private: new FixtureContent(DEEPFIXTURES),
+          private: {
+            mode: 0o000,
+            content: {
+              secret: {
+                mode: 0o000,
+                content: {
+                  'SECRET.key': {
+                    content: {
+                      mode: 0o000,
+                      content: '123456',
+                    },
+                  },
+                },
+              },
+            },
+          },
         };
+
         const inaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
         const indexPath = path.join(
           dir.name,
@@ -125,20 +137,31 @@ describe(__filename, () => {
     it('should work with nested mixed directories', async () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
-        const DEEPERFIXTURES = {
-          'SECRET.key': new FixtureContent('123456'),
-          'PUBLIC.key': '654321',
-        };
-        const DEEPFIXTURES = {
-          secret: DEEPERFIXTURES,
-          anotherDir: {
-            'index.js': '42;',
+        const FIXTURES: Fixtures = {
+          private: {
+            mode: 0o000,
+            content: {
+              secret: {
+                mode: 0o000,
+                content: {
+                  'PUBLIC.key': '654321',
+                  'SECRET.key': {
+                    content: {
+                      mode: 0o000,
+                      content: '123456',
+                    },
+                  },
+                },
+              },
+              anotherDir: {
+                'index.js': '42;',
+              },
+              'anotherfile.js': '99;',
+            },
           },
-        };
-        const FIXTURES = {
-          private: new FixtureContent(DEEPFIXTURES, 0o644),
           'README.md': 'Hello World.',
         };
+
         const inaccessibleFixtures = await setupFixtures(dir.name, FIXTURES);
 
         // test SECRET.key is inaccessible
@@ -177,11 +200,13 @@ describe(__filename, () => {
     });
 
     it('should work with inaccessible assets', async () => {
-      const SUBFIXTURES = {
-        'README.md': 'Hello World.',
-      };
       const FIXTURES = {
-        private: new FixtureContent(SUBFIXTURES),
+        private: {
+          mode: 0o000,
+          content: {
+            'README.md': 'Hello World.',
+          },
+        },
       };
       const origDir = process.cwd();
       let readmePath: string;
