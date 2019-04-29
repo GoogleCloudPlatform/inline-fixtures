@@ -14,8 +14,4 @@
  * limitations under the License.
  */
 
-export {
-  Fixtures,
-  withFixtures,
-  FixtureContent as WrongFile,
-} from './fixtures';
+export { Fixtures, withFixtures } from './fixtures';

@@ -19,18 +19,22 @@ import makeDir from 'make-dir';
 import * as path from 'path';
 import * as tmp from 'tmp';
 
-export class FixtureContent {
-  constructor(public content: string | Fixtures, public mode = 0o000) {}
-  toFixture(key: string): Fixtures {
-    return { [key]: this.content };
-  }
+export type FixtureContent = string | Fixtures | FixtureWithMode;
+
+export interface FixtureWithMode {
+  content: string | Fixtures;
+  mode: number;
+}
+
+function isFixturesWithMode(fix: FixtureContent): fix is FixtureWithMode {
+  return 'number' === typeof (fix as FixtureWithMode).mode;
 }
 
 export interface Fixtures {
   // If string, we create a file with that string contents. If fixture, we
   // create a subdirectory and recursively install the fixture.
   // TODO: support buffers to allow non-text files.
-  [name: string]: string | Fixtures | FixtureContent;
+  [name: string]: FixtureContent;
 }
 
 export async function setupFixtures(
@@ -46,11 +50,10 @@ export async function setupFixtures(
 
     if (typeof contents === 'string') {
       fs.writeFileSync(filePath, contents);
-    } else if (contents instanceof FixtureContent) {
-      const deepinaccessibleFixtures = await setupFixtures(
-        dir,
-        contents.toFixture(key)
-      );
+    } else if (isFixturesWithMode(contents)) {
+      const deepinaccessibleFixtures = await setupFixtures(dir, {
+        [key]: contents.content,
+      });
       fs.chmodSync(filePath, contents.mode);
       inaccessibleFixtures = [
         filePath,
