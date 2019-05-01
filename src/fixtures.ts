@@ -88,12 +88,12 @@ export async function withFixtures(
   try {
     return await fn(dir.name);
   } finally {
-    // Change back all files permissions otherwise tmp would not be allowed to delete the temp directory he has created.
-    inaccessibleFixtures.forEach((filePath: string) =>
-      fs.chmodSync(filePath, 0o777)
-    );
     process.chdir(origDir);
     if (!keep) {
+      // Change back all files permissions otherwise tmp would not be allowed to delete the temp directory he has created.
+      inaccessibleFixtures.forEach((filePath: string) =>
+        fs.chmodSync(filePath, 0o777)
+      );
       dir.removeCallback();
     }
   }
