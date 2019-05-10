@@ -4,7 +4,7 @@
   "description": "",
   "repository": "ofrobots/inline-fixtures",
   "publishConfig": {
-    "registry": "https://wombat-dressing-room.appspot.com"
+    "registry": "https://wombat-dressing-room.appspot.com/inline-fixtures/_ns"
   },
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",

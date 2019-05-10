@@ -21,13 +21,8 @@ import * as tmp from 'tmp';
 
 export type FixtureContent = string | Fixtures | FixtureWithMode;
 
-export interface FixtureWithMode {
-  content: string | Fixtures;
-  mode: number;
-}
-
-function isFixturesWithMode(fix: FixtureContent): fix is FixtureWithMode {
-  return 'number' === typeof (fix as FixtureWithMode).mode;
+export class FixtureWithMode {
+  constructor(readonly mode: number, readonly content: string | Fixtures) {}
 }
 
 export interface Fixtures {
@@ -50,7 +45,7 @@ export async function setupFixtures(
 
     if (typeof contents === 'string') {
       fs.writeFileSync(filePath, contents);
-    } else if (isFixturesWithMode(contents)) {
+    } else if (contents instanceof FixtureWithMode) {
       const deepinaccessibleFixtures = await setupFixtures(dir, {
         [key]: contents.content,
       });
