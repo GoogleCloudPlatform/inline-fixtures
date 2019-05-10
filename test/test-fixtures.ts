@@ -74,6 +74,26 @@ describe(__filename, () => {
       }
     });
 
+    it('should properly deal with files named mode', async () => {
+      const dir = tmp.dirSync({ unsafeCleanup: true });
+      try {
+        const FIXTURES = {
+          mode: 'a file named mode',
+          content: 'a file named content',
+        };
+        await setupFixtures(dir.name, FIXTURES);
+        const modePath = path.join(dir.name, 'mode');
+        assert.strictEqual(fs.readFileSync(modePath, 'utf8'), FIXTURES.mode);
+        const contentPath = path.join(dir.name, 'content');
+        assert.strictEqual(
+          fs.readFileSync(contentPath, 'utf8'),
+          FIXTURES.content
+        );
+      } finally {
+        dir.removeCallback();
+      }
+    });
+
     it('should create an inaccessible directory', async () => {
       const dir = tmp.dirSync({ unsafeCleanup: true });
       try {
