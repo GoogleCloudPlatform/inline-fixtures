@@ -78,7 +78,7 @@ export async function withFixtures(
   fn: (fixturesDir: string) => PromiseLike<void>
 ) {
   const keep = !!process.env.INLINE_FIXTURES_KEEP;
-  const dir = tmp.dirSync({ keep, unsafeCleanup: true });
+  const dir = tmp.dirSync({keep, unsafeCleanup: true});
 
   const inaccessibleFixtures = await setupFixtures(dir.name, fixtures);
 

@@ -18,12 +18,13 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tmp from 'tmp';
-import { setupFixtures, withFixtures, Fixtures } from '../src/fixtures';
+import {describe, it} from 'mocha';
+import {setupFixtures, withFixtures, Fixtures} from '../src/fixtures';
 
 describe(__filename, () => {
   describe('setupFixtures', () => {
     it('should populate directory with the requested entries', async () => {
-      const dir = tmp.dirSync({ unsafeCleanup: true });
+      const dir = tmp.dirSync({unsafeCleanup: true});
       try {
         const FIXTURES = {
           'README.md': 'Hello World.',
@@ -40,7 +41,7 @@ describe(__filename, () => {
     });
 
     it('should work with nested directories', async () => {
-      const dir = tmp.dirSync({ unsafeCleanup: true });
+      const dir = tmp.dirSync({unsafeCleanup: true});
       try {
         const FIXTURES = {
           'README.md': 'Hello Mars.',
@@ -58,7 +59,7 @@ describe(__filename, () => {
     });
 
     it('should create an inaccessible file', async () => {
-      const dir = tmp.dirSync({ unsafeCleanup: true });
+      const dir = tmp.dirSync({unsafeCleanup: true});
       try {
         const FIXTURES = {
           'README.md': {
@@ -75,7 +76,7 @@ describe(__filename, () => {
     });
 
     it('should create an inaccessible directory', async () => {
-      const dir = tmp.dirSync({ unsafeCleanup: true });
+      const dir = tmp.dirSync({unsafeCleanup: true});
       try {
         const FIXTURES = {
           private: {
@@ -97,7 +98,7 @@ describe(__filename, () => {
     });
 
     it('should work with nested inaccessible directories', async () => {
-      const dir = tmp.dirSync({ unsafeCleanup: true });
+      const dir = tmp.dirSync({unsafeCleanup: true});
       try {
         const FIXTURES = {
           private: {
@@ -135,7 +136,7 @@ describe(__filename, () => {
     });
 
     it('should work with nested mixed directories', async () => {
-      const dir = tmp.dirSync({ unsafeCleanup: true });
+      const dir = tmp.dirSync({unsafeCleanup: true});
       try {
         const FIXTURES: Fixtures = {
           private: {
