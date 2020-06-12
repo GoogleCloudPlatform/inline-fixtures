@@ -1,6 +1,11 @@
+<img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
+
 # inline-fixtures
 
-[![CircleCI](https://circleci.com/gh/ofrobots/inline-fixtures.svg?style=svg)](https://circleci.com/gh/ofrobots/inline-fixtures)
+[![NPM Version](https://img.shields.io/npm/v/inline-fixtures.svg)](https://npmjs.org/package/inline-fixtures)
+[![Build Status](https://github.com/GoogleCloudPlatform/inline-fixtures/workflows/ci/badge.svg)](https://github.com/GoogleCloudPlatform/inline-fixtures/actions)
+[![Known Vulnerabilities](https://snyk.io/test/github/GoogleCloudPlatform/inline-fixtures/badge.svg?targetFile=package.json)](https://snyk.io/test/github/GoogleCloudPlatform/inline-fixtures?targetFile=package.json)
+[![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
 Sometimes tests need fixture directories. [Observe](https://github.com/nodejs/node/blob/d3fb7e1b3658a6f00e1c631aa551f2ea0ab81f5e/test/parallel/test-require-dot.js):
 
@@ -37,8 +42,19 @@ describe('tests for fs.readFileSync', () => {
       // and `anotherDir`. The latter contains `index.js`.
       const readmePath = path.join(fixturesDir, 'README.md');
       const contents = fs.readFileSync(readmePath, 'utf8');
-      assert.strictEqual(contents, FIXTURES['README.md']);     
+      assert.strictEqual(contents, FIXTURES['README.md']);
     });
   });
 });
 ```
+## Supported Node.js Versions
+Our client libraries follow the [Node.js release schedule](https://nodejs.org/en/about/releases/). Libraries are compatible with all current _active_ and _maintenance_ versions of Node.js.
+
+## License
+[Apache-2.0](LICENSE)
+
+---
+Made with ❤️ by the Google Node.js team.
+
+> ***NOTE: This is not an official Google product.***
+
