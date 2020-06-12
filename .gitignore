@@ -1,13 +1,7 @@
 **/*.log
 **/node_modules
-.coverage
-.nyc_output
-docs/
-out/
+coverage
 build/
-system-test/secrets.js
-system-test/*key.json
 *.lock
 .DS_Store
-key.json
-node_modules
+package-lock.json
