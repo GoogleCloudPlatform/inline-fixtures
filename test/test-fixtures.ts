@@ -18,6 +18,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tmp from 'tmp';
+import * as os from 'os';
 import {describe, it} from 'mocha';
 import {setupFixtures, withFixtures, Fixtures} from '../src/fixtures';
 
@@ -76,6 +77,9 @@ describe(__filename, () => {
     });
 
     it('should create an inaccessible directory', async () => {
+      if (os.platform().includes('win')) {
+        return;
+      }
       const dir = tmp.dirSync({unsafeCleanup: true});
       try {
         const FIXTURES = {
@@ -201,6 +205,9 @@ describe(__filename, () => {
     });
 
     it('should work with inaccessible assets', async () => {
+      if (os.platform().includes('win')) {
+        return;
+      }
       const FIXTURES = {
         private: {
           mode: 0o000,
