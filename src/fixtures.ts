@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as fs from 'fs';
-import makeDir from 'make-dir';
+// eslint-disable-next-line node/no-unsupported-features/node-builtins
+import {promises as fs} from 'fs';
 import * as path from 'path';
 import * as tmp from 'tmp';
 
@@ -49,19 +49,19 @@ export async function setupFixtures(
     const contents = fixtures[key];
 
     if (typeof contents === 'string') {
-      fs.writeFileSync(filePath, contents);
+      await fs.writeFile(filePath, contents);
     } else if (isFixturesWithMode(contents)) {
       const deepinaccessibleFixtures = await setupFixtures(dir, {
         [key]: contents.content,
       });
-      fs.chmodSync(filePath, contents.mode);
+      await fs.chmod(filePath, contents.mode);
       inaccessibleFixtures = [
         filePath,
         ...deepinaccessibleFixtures,
         ...inaccessibleFixtures,
       ];
     } else {
-      await makeDir(filePath);
+      await fs.mkdir(filePath, {recursive: true});
       const fixture = fixtures[key] as Fixtures;
       const deepinaccessibleFixtures = await setupFixtures(filePath, fixture);
       inaccessibleFixtures = [
@@ -91,8 +91,8 @@ export async function withFixtures(
     process.chdir(origDir);
     if (!keep) {
       // Change back all files permissions otherwise tmp would not be allowed to delete the temp directory he has created.
-      inaccessibleFixtures.forEach((filePath: string) =>
-        fs.chmodSync(filePath, 0o777)
+      inaccessibleFixtures.forEach(
+        async filePath => await fs.chmod(filePath, 0o777)
       );
       dir.removeCallback();
     }
