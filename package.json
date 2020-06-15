@@ -1,6 +1,6 @@
 {
   "name": "inline-fixtures",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "",
   "repository": "GoogleCloudPlatform/inline-fixtures",
   "main": "build/src/index.js",
