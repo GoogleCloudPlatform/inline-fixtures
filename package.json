@@ -30,7 +30,7 @@
     "c8": "^7.2.0",
     "gts": "^3.0.0",
     "mocha": "^9.0.0",
-    "typescript": "~4.4.0"
+    "typescript": "~5.4.0"
   },
   "dependencies": {
     "tmp": "0.2.1"
